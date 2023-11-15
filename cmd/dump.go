@@ -10,11 +10,13 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func init() {
 	wrapperCmd.AddCommand(dumpCmd)
 	dumpCmd.Flags().BoolP("keep-prologue", "k", false, "keep the prologue of the .gitignore")
+	dumpCmd.Flags().BoolP("remove-duplication", "r", false, "remove the duplicated boilerplate names")
 }
 
 var dumpCmd = &cobra.Command{
@@ -22,22 +24,52 @@ var dumpCmd = &cobra.Command{
 	Short: "Dump a boilerplate",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ordinals, appends, removes := splitArgs(cmd.Flags().Args())
-		if len(appends) > 0 { // append mode
-			results, err := findBoilerplatesInGitignoreFile(filepath.Join(".", gitignoreFileName))
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-			ordinals = append(results, append(ordinals, appends...)...)
-		}
-		if len(removes) > 0 { // remove mode
-			ordinals = removeSpecifiedBoilerplates(ordinals, removes)
-		}
-		return dumpImpl(ordinals, cmd)
+		args4gibo := makeArgumentsForGibo(cmd, args)
+		return callGibo(append([]string{"dump"}, args4gibo...), cmd)
 	},
 }
 
-func dumpImpl(args []string, cmd *cobra.Command) error {
+func makeArgumentsForGibo(cmd *cobra.Command, args []string) []string {
+	ordinals, appends, removes := splitArgs(cmd.Flags().Args())
+	if len(appends) > 0 { // append mode
+		results, err := findBoilerplatesInGitignoreFile(filepath.Join(".", gitignoreFileName))
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		ordinals = append(results, append(ordinals, appends...)...)
+	}
+	if len(removes) > 0 { // remove mode
+		ordinals = removeSpecifiedBoilerplates(ordinals, removes)
+	}
+	results := removeDuplicationIfRequested(ordinals, cmd.Flags())
+	dumpPrologue(cmd)
+	return results
+}
+
+func removeDuplicationIfRequested(names []string, flags *pflag.FlagSet) []string {
+	removeDuplicationRequested, _ := flags.GetBool("remove-duplication")
+	if !removeDuplicationRequested {
+		return names
+	}
+	results := []string{}
+	for _, name := range names {
+		if !contains(results, name) {
+			results = append(results, name)
+		}
+	}
+	return results
+}
+
+func contains(names []string, name string) bool {
+	for _, n := range names {
+		if strings.ToLower(n) == name {
+			return true
+		}
+	}
+	return false
+}
+
+func dumpPrologue(cmd *cobra.Command) error {
 	keepPrologueFlag, err := cmd.Flags().GetBool("keep-prologue")
 	if err != nil {
 		return err
@@ -48,7 +80,7 @@ func dumpImpl(args []string, cmd *cobra.Command) error {
 			return err
 		}
 	}
-	return callGibo(append([]string{"dump"}, args...), cmd)
+	return nil
 }
 
 func readAndWritePrologue(cmd *cobra.Command) error {
