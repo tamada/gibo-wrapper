@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"bufio"
+	"fmt"
+	"io"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -10,6 +14,7 @@ import (
 
 func init() {
 	wrapperCmd.AddCommand(dumpCmd)
+	dumpCmd.Flags().BoolP("keep-prologue", "k", false, "keep the prologue of the .gitignore")
 }
 
 var dumpCmd = &cobra.Command{
@@ -28,8 +33,44 @@ var dumpCmd = &cobra.Command{
 		if len(removes) > 0 { // remove mode
 			ordinals = removeSpecifiedBoilerplates(ordinals, removes)
 		}
-		return callGibo(append([]string{"dump"}, args...), cmd)
+		return dumpImpl(ordinals, cmd)
 	},
+}
+
+func dumpImpl(args []string, cmd *cobra.Command) error {
+	keepPrologueFlag, err := cmd.Flags().GetBool("keep-prologue")
+	if err != nil {
+		return err
+	}
+	if keepPrologueFlag {
+		err := readAndWritePrologue(cmd)
+		if err != nil {
+			return err
+		}
+	}
+	return callGibo(append([]string{"dump"}, args...), cmd)
+}
+
+func readAndWritePrologue(cmd *cobra.Command) error {
+	in, err := os.Open(".gitignore")
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	reader := bufio.NewReader(in)
+	dest := cmd.OutOrStdout()
+	for {
+		lineByte, _, err := reader.ReadLine()
+		line := string(lineByte)
+		if err == io.EOF {
+			break
+		}
+		if strings.HasPrefix(line, "###") {
+			break
+		}
+		fmt.Fprintln(dest, line)
+	}
+	return nil
 }
 
 func splitArgs(args []string) ([]string, []string, []string) {
