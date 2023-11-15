@@ -45,11 +45,21 @@ func findRegisteredBoilerplates(args []string) ([]string, error) {
 	if len(args) == 0 {
 		return findBoilerplatesInGitignoreFile(filepath.Join(".", gitignoreFileName))
 	}
+
 	gitIgnorePath := args[0]
-	if filepath.Base(gitIgnorePath) == gitignoreFileName {
+	fmt.Printf("filepath.Base(%s): %s (%v)\n", gitIgnorePath, filepath.Base(gitIgnorePath), isDirectory(gitIgnorePath))
+	if filepath.Base(gitIgnorePath) != gitignoreFileName && isDirectory(gitIgnorePath) {
 		gitIgnorePath = filepath.Join(gitIgnorePath, gitignoreFileName)
 	}
 	return findBoilerplatesInGitignoreFile(gitIgnorePath)
+}
+
+func isDirectory(path string) bool {
+	stat, err := os.Stat(path)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return stat != nil && stat.IsDir()
 }
 
 func Exists(filename string) bool {

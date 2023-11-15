@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"io"
 	"os/exec"
 
 	"github.com/spf13/cobra"
@@ -13,15 +14,15 @@ var wrapperCmd = &cobra.Command{
 	SilenceUsage:  true,
 	Args:          cobra.ArbitraryArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return callGibo(args, cmd)
+		return callGibo(args, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	},
 }
 
-func callGibo(args []string, command *cobra.Command) error {
+func callGibo(args []string, stdout, stderr io.Writer) error {
 	newArgs := append([]string{"gibo"}, args...)
 	cmd := exec.Command("command", newArgs...)
-	cmd.Stdout = command.OutOrStdout()
-	cmd.Stderr = command.ErrOrStderr()
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
 	return cmd.Run()
 }
 

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,17 +23,22 @@ var dumpCmd = &cobra.Command{
 	Short: "Dump a boilerplate",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		args4gibo := makeArgumentsForGibo(cmd, args)
-		return callGibo(append([]string{"dump"}, args4gibo...), cmd)
+		stdout := cmd.OutOrStdout()
+		stderr := cmd.OutOrStderr()
+		args4gibo, err := makeArgumentsForGibo(cmd, args)
+		if err != nil {
+			return err
+		}
+		return callGibo(append([]string{"dump"}, args4gibo...), stdout, stderr)
 	},
 }
 
-func makeArgumentsForGibo(cmd *cobra.Command, args []string) []string {
+func makeArgumentsForGibo(cmd *cobra.Command, args []string) ([]string, error) {
 	ordinals, appends, removes := splitArgs(cmd.Flags().Args())
 	if len(appends) > 0 { // append mode
 		results, err := findBoilerplatesInGitignoreFile(filepath.Join(".", gitignoreFileName))
 		if err != nil {
-			log.Fatal(err.Error())
+			return nil, err
 		}
 		ordinals = append(results, append(ordinals, appends...)...)
 	}
@@ -42,8 +46,11 @@ func makeArgumentsForGibo(cmd *cobra.Command, args []string) []string {
 		ordinals = removeSpecifiedBoilerplates(ordinals, removes)
 	}
 	results := removeDuplicationIfRequested(ordinals, cmd.Flags())
-	dumpPrologue(cmd)
-	return results
+	err := dumpPrologue(cmd)
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
 }
 
 func removeDuplicationIfRequested(names []string, flags *pflag.FlagSet) []string {
@@ -84,7 +91,7 @@ func dumpPrologue(cmd *cobra.Command) error {
 }
 
 func readAndWritePrologue(cmd *cobra.Command) error {
-	in, err := os.Open(".gitignore")
+	in, err := os.Open(gitignoreFileName)
 	if err != nil {
 		return err
 	}
