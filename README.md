@@ -1,10 +1,10 @@
 # gibo-wrapper
 
-[![Build Status](https://travis-ci.org/tamada/gibo-wrapper.svg?branch=master)](https://travis-ci.org/tamada/gibo-wrapper)
+[![build](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml/badge.svg)](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/tamada/gibo-wrapper/badge.svg?branch=main)](https://coveralls.io/github/tamada/gibo-wrapper?branch=main)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tamada/gibo-wrapper)](https://goreportcard.com/report/github.com/tamada/gibo-wrapper)
 
-[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.5.0-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.5.0)
+[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.5.2-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.5.2)
 [![Unlicense license](http://img.shields.io/badge/license-Unlicense-blue.svg?style=flat)](LICENSE)
 
 [`gibo`](https://github.com/simonwhitaker/gibo) is a great tool for creating `.gitignore` files.
@@ -37,6 +37,8 @@ make
 ```
 
 ## Additional Commands
+
+In the following example, `gibo` command is actually `gibo-wrapper`, it is aliased.
 
 ### `list-ignore` command
 
@@ -97,7 +99,7 @@ In the use of `gibo`, adding/removing boilerplates may cause the duplication of 
 
 ## `init` command
 
-`init` command is for initializing `gibo`` and `gibo-wrapper` commands in the shell configuration file.
+`init` command is for initializing `gibo` and `gibo-wrapper` commands in the shell configuration file.
 Add the following line in your shell configuration file, such as `.zshrc` and `.bashrc`.
 
 ```sh
