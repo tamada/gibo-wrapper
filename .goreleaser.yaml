@@ -22,17 +22,20 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
 
-archives:
+# https://github.com/goreleaser/goreleaser/issues/236
+archives: # archive name want to be all lower case.
   - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    replacements: 
+      amd64: x86_64
+      arm64: aarch64
+      darwin: darwin
+      linux: linux
+      windows: windows
     # use zip for windows archives
     format_overrides:
       - goos: windows
@@ -49,6 +52,7 @@ brews:
   - homepage: https://tamada.github.com/gibo-wrapper
     description: "gibo-wrapper acts like gibo to improve gibo by adding the following features"
     license: "Unlicense license"
+    folder: Formula
     dependencies:
       - name: "gibo"
     repository:

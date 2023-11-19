@@ -2,7 +2,7 @@ package cmd
 
 import "github.com/spf13/cobra"
 
-const VERSION = "0.5.7"
+const VERSION = "0.5.8"
 
 func init() {
 	wrapperCmd.AddCommand(versionCmd)
