@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # これがないとリリースを作成できない
+      contents: write # needs for goreleaser
     steps:
       # チェックアウト
       - uses: actions/checkout@v3

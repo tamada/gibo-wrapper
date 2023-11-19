@@ -9,6 +9,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # needs to push tags
     if: startsWith(github.head_ref, 'releases/v') && github.event.pull_request.merged == true
     env:
       REPO: https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
