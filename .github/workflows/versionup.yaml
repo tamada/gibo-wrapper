@@ -1,4 +1,4 @@
-name: Version Up
+name: version Up
 on:
   push:
     branches:
