@@ -54,4 +54,4 @@ brews:
     repository:
       owner: tamada
       name: homebrew-tap
-      token: "${{ .Env.TAP_GITHUB_TOKEN }}"
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
