@@ -43,5 +43,5 @@ jobs:
 
       - name: Push Tag
         run: |
-          git tag -a ${{ steps.vars.outputs.tag }} -m "Release ${{ steps.vars.outputs.tag }}"
+          git tag -a v${{ steps.vars.outputs.tag }} -m "Release ${{ steps.vars.outputs.tag }}"
           git push $REPO --tags
