@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/simonwhitaker/gibo/utils"
 	"github.com/spf13/cobra"
+	"github.com/tamada/gibo-wrapper/utils"
 	"golang.org/x/term"
 )
 
@@ -47,7 +47,6 @@ func findRegisteredBoilerplates(args []string) ([]string, error) {
 	}
 
 	gitIgnorePath := args[0]
-	fmt.Printf("filepath.Base(%s): %s (%v)\n", gitIgnorePath, filepath.Base(gitIgnorePath), isDirectory(gitIgnorePath))
 	if filepath.Base(gitIgnorePath) != gitignoreFileName && isDirectory(gitIgnorePath) {
 		gitIgnorePath = filepath.Join(gitIgnorePath, gitignoreFileName)
 	}
