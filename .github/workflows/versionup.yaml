@@ -8,7 +8,7 @@ jobs:
   versionup:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # this line requires for release
+      contents: write # needs for push changes
     steps:
       - name: Get branches
         id: vars
