@@ -26,16 +26,13 @@ builds:
       - amd64
       - arm64
 
-# https://github.com/goreleaser/goreleaser/issues/236
-archives: # archive name want to be all lower case.
+archives:
   - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    replacements: 
-      amd64: x86_64
-      arm64: aarch64
-      darwin: darwin
-      linux: linux
-      windows: windows
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- replace .Version "v" "" }}_
+      {{- title .Os | tolower }}_
+      {{- .Arch | tolower -}}
     # use zip for windows archives
     format_overrides:
       - goos: windows
