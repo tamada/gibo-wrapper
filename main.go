@@ -7,7 +7,7 @@ import (
 	"github.com/tamada/gibo-wrapper/cmd"
 )
 
-func goMain(args []string) int {
+func goMain() int {
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err.Error())
 		return 1
@@ -16,6 +16,6 @@ func goMain(args []string) int {
 }
 
 func main() {
-	status := goMain(os.Args[1:])
+	status := goMain()
 	os.Exit(status)
 }
