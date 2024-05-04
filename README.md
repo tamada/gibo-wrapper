@@ -4,13 +4,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/tamada/gibo-wrapper/badge.svg?branch=main)](https://coveralls.io/github/tamada/gibo-wrapper?branch=main)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tamada/gibo-wrapper)](https://goreportcard.com/report/github.com/tamada/gibo-wrapper)
 
-[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.5.9-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.5.9)
+[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.6.0-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.6.0)
 [![Unlicense license](http://img.shields.io/badge/license-Unlicense-blue.svg?style=flat)](LICENSE)
 
 [`gibo`](https://github.com/simonwhitaker/gibo) is a great tool for creating `.gitignore` files.
 However, `gibo` can improve some features in the aspect of managing `.gitignore`.
-Then, I sent [a pull request](https://github.com/simonwhitaker/gibo/pull/61) to `gibo`. However, the author does not think for growing in the direction.
-Therefore, I created the wrapper of `gibo` to extend the features.
+Then, I sent [a pull request](https://github.com/simonwhitaker/gibo/pull/61) to `gibo`. However, it was not accepted because it seemed to be different from the author's direction.
+Therefore, I created the wrapper of `gibo` to introduce the new features for managing `.gitignore`.
 
 ## Usage
 
@@ -32,22 +32,22 @@ brew install tamada/tap/gibo-wrapper
 ```sh
 git clone https://github.com/tamada/gibo-wrapper
 cd gibo-wrapper
-make
+cargo build --release
 # put the resultant executable 'gibo-wrapper' into the suitable location.
 ```
 
 ## Additional Commands
 
-In the following example, `gibo` command is actually `gibo-wrapper`, it is aliased.
+In the following example, `gibo` command is `gibo-wrapper`, it is aliased.
 
-### `list-ignore` command
+### `current-list` command
 
 list boilerplates of `.gitignore` files in the current directory.
 
 ```bash
-$ gibo list-ignore
+$ gibo current-list
 macOS            Linux            Windows          Go
-VisualStudioCode NetBeans
+VisualStudioCode JetBrains
 ```
 
 ### Additional features in `dump` command
@@ -60,10 +60,10 @@ Then, we add the arguments of the `dump` command to the list by removing `+`.
 Finally, `gibo` dumps boilerplates of the resultant name list.
 
 ```
-$ gibo list-ignore
+$ gibo current-list
 macOS            Linux            Go
 $ gibo dump +windows > .gitignore
-$ gibo list-ignore
+$ gibo current-list
 macOS            Linux            Go               Windows
 ```
 
@@ -73,22 +73,22 @@ Also, if any arguments of the `dump` command start with `_`, `gibo` dumps the bo
 In the remove mode, `gibo` removes the given names from the boilerplates list.
 
 ```bash
-$ gibo list-ignore
+$ gibo current-list
 macOS            Linux            Go               Windows
 $ gibo dump _windows > .gitignore
-$ gibo list-ignore
+$ gibo current-list
 macOS            Linux            Go
 ```
 
 ```bash
 $ gibo dump macos linux windows _windows > .gitignore
-$ gibo list-ignore
+$ gibo current-list
 macOS            Linux            Go
 ```
 
 #### `--keep-prologue` option
 
-In the use of `gibo`, we sometimes add some content to the top of the `.gitignore` file.
+In the use of `gibo`, we sometimes add some content to the top of `.gitignore` file.
 In such a case, we want to keep the content.
 `--keep-prologue` option is for this purpose.
 
@@ -96,12 +96,3 @@ In such a case, we want to keep the content.
 
 In the use of `gibo`, adding/removing boilerplates may cause the duplication of boilerplates.
 `--remove-duplication` option removes duplicated boilerplates and dumps them.
-
-## `init` command
-
-`init` command is for initializing `gibo` and `gibo-wrapper` commands in the shell configuration file.
-Add the following line in your shell configuration file, such as `.zshrc` and `.bashrc`.
-
-```sh
-eval "$(gibo-wrapper init $SHELL)"
-```
