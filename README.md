@@ -2,9 +2,8 @@
 
 [![build](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml/badge.svg)](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/tamada/gibo-wrapper/badge.svg?branch=main)](https://coveralls.io/github/tamada/gibo-wrapper?branch=main)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tamada/gibo-wrapper)](https://goreportcard.com/report/github.com/tamada/gibo-wrapper)
 
-[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.6.0-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.6.0)
+[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v)
 [![Unlicense license](http://img.shields.io/badge/license-Unlicense-blue.svg?style=flat)](LICENSE)
 
 [`gibo`](https://github.com/simonwhitaker/gibo) is a great tool for creating `.gitignore` files.
@@ -50,11 +49,11 @@ macOS            Linux            Windows          Go
 VisualStudioCode JetBrains
 ```
 
-### Additional features in `dump` command
+### Additional features for `dump` command
 
 #### append mode
 
-If any arguments of the `dump` command start with `+`, `gibo` dumps the boilerplates in append mode.
+If the arguments of the `dump` command start with `+`, `gibo` dumps the boilerplates in append mode.
 In append mode, at first, `gibo` extracts the list of boilerplates from the `.gitignore` file in the current directory.
 Then, we add the arguments of the `dump` command to the list by removing `+`.
 Finally, `gibo` dumps boilerplates of the resultant name list.
