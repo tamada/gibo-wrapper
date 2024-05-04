@@ -29,7 +29,7 @@ jobs:
         run: |
           sed "s/^version = \".*\"/version = \"${{ steps.vars.outputs.tag }}\"/" Cargo.toml > a ; mv a Cargo.toml
           sed -e "s/\${VERSION}/${TO_VERSION}/g" -e "s/\${VERSION_DH}/${TO_VERSION//-/--}/g" .templates/README.md > README.md
-          git commit -a -m "update version to ${{ steps.vars.outputs.tag }}, ready to publish v${{ steps.vars.outputs.tag }}") || true
+          git commit -a -m "update version to ${{ steps.vars.outputs.tag }}, ready to publish v${{ steps.vars.outputs.tag }}" || true
 
       - name: Push branch
         uses: ad-m/github-push-action@master
