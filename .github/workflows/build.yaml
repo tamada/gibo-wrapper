@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - "**"
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -11,30 +10,29 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macOS-latest
-
+          # - windows-latest
+          - macos-latest
     steps:
-      - name: setup go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.21
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - name: checkout
-        uses: actions/checkout@v3
+      - name: Setup Rust LLVM coverage tools
+        run: |
+          rustup component add llvm-tools-preview
+          cargo install cargo-llvm-cov
 
-      - name: build
-        run: make
+      - name: Checkout the project
+        uses: actions/checkout@v4
 
-      - name: Convert coverage to lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.0
-        with:
-          infile: coverage.out
-          outfile: coverage.lcov
+      - name: Test & Build
+        run: |
+          cargo llvm-cov --lcov --output-path coverage.lcov
+          cargo build
+
+      - name: Send coverage to coveralls
+        uses: coverallsapp/github-action@master
         if: matrix.os == 'ubuntu-latest'
-
-      - name: coveralls
-        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.github_token }}
           path-to-lcov: coverage.lcov
-        if: matrix.os == 'ubuntu-latest'
+  
