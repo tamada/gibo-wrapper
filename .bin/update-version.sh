@@ -13,5 +13,3 @@ for i in $(find .templates -type f)
 do
     update $i ${i#.templates/}
 done
-
-sed -e "s/^const VERSION = \".*\"$/const VERSION = \"${TO_VERSION}\"/g" cmd/version.go > a; mv a cmd/version.go
