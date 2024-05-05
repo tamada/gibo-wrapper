@@ -52,12 +52,28 @@ mod tests {
     use super::*;
     #[test]
     fn test_print_in_column_string() {
-        let v1 = vec!["macOS", "Linux", "Windows", "Go", "VisualStudioCode", "JetBrains"];
+        let v1 = vec![
+            "macOS",
+            "Linux",
+            "Windows",
+            "Go",
+            "VisualStudioCode",
+            "JetBrains",
+        ];
         let r1 = print_in_column_string(v1.iter().map(|s| s.to_string()).collect(), 125);
         assert_eq!(r1.len(), 1);
         assert_eq!(r1[0], "macOS            Linux            Windows          Go               VisualStudioCode JetBrains");
 
-        let v2 = vec!["macOS", "Linux", "Windows", "Go", "VisualStudioCode", "JetBrains", "Rust", "NetBeans"];
+        let v2 = vec![
+            "macOS",
+            "Linux",
+            "Windows",
+            "Go",
+            "VisualStudioCode",
+            "JetBrains",
+            "Rust",
+            "NetBeans",
+        ];
         let r2 = print_in_column_string(v2.iter().map(|s| s.to_string()).collect(), 125);
         assert_eq!(r2.len(), 2);
         assert_eq!(r2[0], "macOS            Linux            Windows          Go               VisualStudioCode JetBrains        Rust");

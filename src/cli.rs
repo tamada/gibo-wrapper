@@ -3,7 +3,9 @@ use std::fmt::{Display, Formatter, Result};
 
 #[derive(Parser, Debug, PartialEq)]
 #[clap(
-    version, author, about,
+    version,
+    author,
+    about,
     arg_required_else_help = true,
     long_about = "gibo-wrapper acts like gibo and improves gibo by adding the following features.
     1. current-list command for dumping the boilerplates while keeping the prologue of .gitignore file.
@@ -22,10 +24,20 @@ pub struct CliOpts {
 pub(crate) enum GiboCommand {
     #[command(about = "Dump a boilerplate")]
     Dump {
-        #[clap(short, long, default_value_t = false, help = "keep the prologue of the .gitignore")]
+        #[clap(
+            short,
+            long,
+            default_value_t = false,
+            help = "keep the prologue of the .gitignore"
+        )]
         keep_prologue: bool,
 
-        #[clap(short, long = "remove-duplication", default_value_t = false, help = "remove the duplicated boilerplate names")]
+        #[clap(
+            short,
+            long = "remove-duplication",
+            default_value_t = false,
+            help = "remove the duplicated boilerplate names"
+        )]
         remove_duplication: bool,
 
         #[clap(help = "the boilerplate names to dump")]
@@ -66,10 +78,13 @@ mod tests {
     #[test]
     fn test_gibo_command() {
         let cli1 = CliOpts::parse_from(&["gibo-wrapper", "dump", "+macos", "linux", "-k", "-r"]);
-        assert_eq!(cli1.command, GiboCommand::Dump {
-            keep_prologue: true,
-            remove_duplication: true,
-            args: vec!["+macos".to_string(), "linux".to_string()],
-        });
+        assert_eq!(
+            cli1.command,
+            GiboCommand::Dump {
+                keep_prologue: true,
+                remove_duplication: true,
+                args: vec!["+macos".to_string(), "linux".to_string()],
+            }
+        );
     }
 }
