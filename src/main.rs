@@ -1,16 +1,13 @@
-use std::{path::PathBuf, process::Command};
 use clap::Parser;
-use cli::GiboCommand::{Dump, CurrentList, List, Root, Search, Update, Version};
+use cli::GiboCommand::{CurrentList, Dump, List, Root, Search, Update, Version};
+use std::{path::PathBuf, process::Command};
 
 mod cli;
 mod list;
 mod terminal;
 
 fn call_gibo_command(command: String, args: Vec<String>) {
-    let _ = Command::new("gibo")
-        .arg(command)
-        .args(args)
-        .spawn();
+    let _ = Command::new("gibo").arg(command).args(args).spawn();
 }
 
 fn print_prologue(dir: &PathBuf) {
@@ -25,7 +22,11 @@ pub fn dedup_ignorecase(args: &mut Vec<String>) {
 }
 
 fn remove_items_from_list_ignorecase(list: &mut Vec<String>, removal: &Vec<String>) {
-    let r = removal.clone().iter().map(|e| e.to_lowercase()).collect::<Vec<String>>();
+    let r = removal
+        .clone()
+        .iter()
+        .map(|e| e.to_lowercase())
+        .collect::<Vec<String>>();
     list.retain(|e| !r.contains(&e.to_lowercase()));
 }
 
@@ -50,7 +51,12 @@ impl DumpArgs {
                 ordinal.push(arg);
             }
         }
-        Self { ordinal, appendage, removal, dir }
+        Self {
+            ordinal,
+            appendage,
+            removal,
+            dir,
+        }
     }
     fn new(args: Vec<String>) -> Self {
         Self::new_with_dir(args, PathBuf::from("."))
@@ -58,13 +64,15 @@ impl DumpArgs {
 
     fn resultant_args(&self, remove_duplication: bool) -> Vec<String> {
         let mut new_args = vec![];
-        if !self.appendage.is_empty() { // append mode
+        if !self.appendage.is_empty() {
+            // append mode
             let current = list::current_list(&self.dir);
             new_args.extend(current);
             new_args.extend(self.ordinal.clone());
             new_args.extend(self.appendage.clone());
         }
-        if !self.removal.is_empty() { // remove mode
+        if !self.removal.is_empty() {
+            // remove mode
             remove_items_from_list_ignorecase(&mut new_args, &self.removal);
         }
         if remove_duplication {
@@ -78,7 +86,11 @@ fn main() {
     let app = cli::CliOpts::parse();
     let dir = PathBuf::from(".");
     match app.command {
-        Dump { keep_prologue, remove_duplication, args } => {
+        Dump {
+            keep_prologue,
+            remove_duplication,
+            args,
+        } => {
             let dump_args = DumpArgs::new(args);
             if keep_prologue {
                 print_prologue(&dir);
@@ -102,9 +114,19 @@ mod tests {
     #[test]
     fn test_dump_args() {
         let args1 = DumpArgs::new_with_dir(vec!["+emacs".to_string()], PathBuf::from("testdata"));
-        assert_eq!(args1.resultant_args(false), vec!["macOS", "Linux", "Windows", "emacs"]);
+        assert_eq!(
+            args1.resultant_args(false),
+            vec!["macOS", "Linux", "Windows", "emacs"]
+        );
 
-        let args2 = DumpArgs::new_with_dir(vec!["+emacs".to_string(), "macos".to_string(), "_windows".to_string()], PathBuf::from("testdata"));
+        let args2 = DumpArgs::new_with_dir(
+            vec![
+                "+emacs".to_string(),
+                "macos".to_string(),
+                "_windows".to_string(),
+            ],
+            PathBuf::from("testdata"),
+        );
         assert_eq!(args2.resultant_args(true), vec!["macOS", "Linux", "emacs"]);
     }
 }
