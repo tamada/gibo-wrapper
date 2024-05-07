@@ -62,7 +62,7 @@ VisualStudioCode JetBrains
 
 ### `gibo-wrapper dump`
 
-`dump` sub-command for `gibo-wrapper` adds four new options, `--keep-prologue`, `--remove-duplication`, `--in-place`, and `--verbose`.
+The `gibo-wrapper` updates `dump` sub-command for adding four new options, `--keep-prologue`, `--remove-duplication`, `--in-place`, and `--verbose`, and two new modes, append mode and remove mode.
 
 ```sh
 Dump a boilerplate
@@ -70,24 +70,19 @@ Dump a boilerplate
 Usage: gibo-wrapper dump [OPTIONS] [ARGS]...
 
 Arguments:
-  [ARGS]...  the boilerplate names to dump
+  [ARGS]...  the boilerplate names to dump.
+             Append boilerplates into the current .gitignore file if the name starts with `+`.
+             Remove boilerplates from the current .gitignore file if the name starts with `_`.
 
 Options:
   -k, --keep-prologue       Keep the prologue of the .gitignore
   -r, --remove-duplication  Remove the duplicated boilerplate names
-  -i, --in-place            Update .gitignore files in-place.
+  -i, --in-place            Update .gitignore files in-place
   -v, --verbose             Show verbose output
   -h, --help                Print help
 ```
 
 In the following example, `gibo` is `gibo-wrapper`, it is aliased.
-
-#### `--in-place` option
-
-`--in-place` option is for updating the `.gitignore` file in the current directory.
-If you use redirect (`>`), such as `gibo dump +macos > .gitignore`, at first `.gitignore` file is truncated and then the `gibo` is executed.
-Therefore, append, and remove mode cannot be used with redirect.
-Hence, `gibo-wrapper` introduces `--in-place` option for updating `.gitignore`.
 
 #### append mode
 
@@ -122,6 +117,13 @@ $ gibo dump --in-place macos linux windows _windows
 $ gibo current-list
 macOS            Linux            Go
 ```
+
+#### `--in-place` option
+
+`--in-place` option is for updating the `.gitignore` file in the current directory.
+If you use redirect (`>`), such as `gibo dump +macos > .gitignore`, at first `.gitignore` file is truncated and then the `gibo` is executed.
+Therefore, append, and remove mode cannot be used with redirect.
+Hence, `gibo-wrapper` introduces `--in-place` option for updating `.gitignore`.
 
 #### `--keep-prologue` option
 

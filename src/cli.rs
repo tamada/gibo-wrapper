@@ -49,7 +49,9 @@ pub(crate) enum GiboCommand {
         #[clap(short, long, help = "Show verbose output")]
         verbose: bool,
 
-        #[clap(help = "the boilerplate names to dump")]
+        #[clap(help = "the boilerplate names to dump.
+Append boilerplates into the current .gitignore file if the name starts with `+`.
+Remove boilerplates from the current .gitignore file if the name starts with `_`.")]
         args: Vec<String>,
     },
     #[command(about = "List available boilerplates")]
