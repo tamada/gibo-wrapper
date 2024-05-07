@@ -1,132 +1,89 @@
+use std::io::{self, Write};
+use std::path::PathBuf;
+use std::process::{Command, Output};
 use clap::Parser;
 use cli::GiboCommand::{CurrentList, Dump, List, Root, Search, Update, Version};
-use std::{path::PathBuf, process::Command};
 
 mod cli;
+mod dump;
 mod list;
 mod terminal;
+mod verboser;
 
-fn call_gibo_command(command: String, args: Vec<String>) {
-    let _ = Command::new("gibo").arg(command).args(args).spawn();
+fn call_gibo_command(command: String, args: Vec<String>, v: &Box<dyn verboser::Verboser>) -> Result<Output, std::io::Error>  {
+    v.eprint(format!("gibo {} {:?}", command, args));
+    Command::new("gibo")
+        .arg(command)
+        .args(args)
+        .output()
 }
 
-fn print_prologue(dir: &PathBuf) {
-    for item in list::find_prologue(dir) {
-        println!("{}", item);
+fn write_to_stdout(output: Output) -> Result<(), std::io::Error> {
+    io::stdout().write_all(&output.stdout).unwrap();
+    io::stderr().write_all(&output.stderr).unwrap();
+    Ok(())
+}
+
+fn print_prologue(dest: &mut Box<dyn Write>, prologue: Vec<String>) {
+    for line in prologue {
+        writeln!(dest, "{}", line).unwrap();
     }
 }
 
-pub fn dedup_ignorecase(args: &mut Vec<String>) {
-    let mut seen = std::collections::HashSet::new();
-    args.retain(|e| seen.insert(e.to_lowercase()));
+fn write_output(dest: &mut Box<dyn Write>, output: Output) -> Result<(), io::Error>{
+    dest.write_all(&output.stdout)
 }
 
-fn remove_items_from_list_ignorecase(list: &mut Vec<String>, removal: &Vec<String>) {
-    let r = removal
-        .clone()
-        .iter()
-        .map(|e| e.to_lowercase())
-        .collect::<Vec<String>>();
-    list.retain(|e| !r.contains(&e.to_lowercase()));
-}
-
-struct DumpArgs {
-    ordinal: Vec<String>,
-    appendage: Vec<String>,
-    removal: Vec<String>,
-    dir: PathBuf,
-}
-
-impl DumpArgs {
-    fn new_with_dir(args: Vec<String>, dir: PathBuf) -> Self {
-        let mut ordinal = vec![];
-        let mut appendage = vec![];
-        let mut removal = vec![];
-        for arg in args {
-            if arg.starts_with("+") {
-                appendage.push(arg.trim_start_matches("+").to_string());
-            } else if arg.starts_with("_") {
-                removal.push(arg.trim_start_matches("_").to_string());
-            } else {
-                ordinal.push(arg);
-            }
-        }
-        Self {
-            ordinal,
-            appendage,
-            removal,
-            dir,
-        }
+fn perform_dump(keep_prologue: bool, remove_duplication: bool, in_place: bool, verbose: bool, args: Vec<String>) -> Result<(), std::io::Error> {
+    let verboser = verboser::create(verbose);
+    let dump_args = dump::DumpArgs::new_with_cwd(args);
+    let new_args = dump_args.resultant_args(remove_duplication);
+    let dest = dump_args.dest(in_place);
+    let mut dest = match dest {
+        Ok(d) => d,
+        Err(e) => return Err(e)
+    };
+    let o = call_gibo_command("dump".to_string(), new_args, &verboser);
+    let o = match o {
+        Err(e) => return Err(e),
+        Ok(output) => output,
+    };
+    if keep_prologue {
+        print_prologue(&mut dest, dump_args.prologue());
     }
-    fn new(args: Vec<String>) -> Self {
-        Self::new_with_dir(args, PathBuf::from("."))
-    }
-
-    fn resultant_args(&self, remove_duplication: bool) -> Vec<String> {
-        let mut new_args = vec![];
-        if !self.appendage.is_empty() {
-            // append mode
-            let current = list::current_list(&self.dir);
-            new_args.extend(current);
-            new_args.extend(self.ordinal.clone());
-            new_args.extend(self.appendage.clone());
-        }
-        if !self.removal.is_empty() {
-            // remove mode
-            remove_items_from_list_ignorecase(&mut new_args, &self.removal);
-        }
-        if remove_duplication {
-            dedup_ignorecase(&mut new_args);
-        }
-        new_args
-    }
+    write_output(&mut dest, o)
 }
 
 fn main() {
     let app = cli::CliOpts::parse();
     let dir = PathBuf::from(".");
-    match app.command {
+    let verboser = verboser::create(app.verbose);
+    let result = match app.command {
         Dump {
             keep_prologue,
             remove_duplication,
+            in_place,
+            verbose,
             args,
-        } => {
-            let dump_args = DumpArgs::new(args);
-            if keep_prologue {
-                print_prologue(&dir);
-            }
-            let new_args = dump_args.resultant_args(remove_duplication);
-            call_gibo_command("dump".to_string(), new_args);
-        }
+        } => perform_dump(keep_prologue, remove_duplication, in_place, verbose, args),
         CurrentList => {
             terminal::print_in_column(list::current_list(&dir));
-        }
+            Ok(())
+        },
         List | Root | Search | Update | Version => {
-            call_gibo_command(format!("{}", app.command), vec![]);
+            match call_gibo_command(format!("{}", app.command), vec![], &verboser) {
+                Ok(output) => {
+                    write_to_stdout(output)
+                },
+                Err(e) => {
+                    Err(e)
+                },
+            }
         }
+    };
+    if let Err(e) = result {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_dump_args() {
-        let args1 = DumpArgs::new_with_dir(vec!["+emacs".to_string()], PathBuf::from("testdata"));
-        assert_eq!(
-            args1.resultant_args(false),
-            vec!["macOS", "Linux", "Windows", "emacs"]
-        );
-
-        let args2 = DumpArgs::new_with_dir(
-            vec![
-                "+emacs".to_string(),
-                "macos".to_string(),
-                "_windows".to_string(),
-            ],
-            PathBuf::from("testdata"),
-        );
-        assert_eq!(args2.resultant_args(true), vec!["macOS", "Linux", "emacs"]);
-    }
-}

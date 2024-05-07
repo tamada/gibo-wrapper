@@ -18,6 +18,9 @@ use std::fmt::{Display, Formatter, Result};
 pub struct CliOpts {
     #[clap(subcommand)]
     pub(crate) command: GiboCommand,
+
+    #[clap(short, long, help = "Show verbose output")]
+    pub(crate) verbose: bool,
 }
 
 #[derive(Debug, Subcommand, PartialEq)]
@@ -28,7 +31,7 @@ pub(crate) enum GiboCommand {
             short,
             long,
             default_value_t = false,
-            help = "keep the prologue of the .gitignore"
+            help = "Keep the prologue of the .gitignore"
         )]
         keep_prologue: bool,
 
@@ -36,9 +39,15 @@ pub(crate) enum GiboCommand {
             short,
             long = "remove-duplication",
             default_value_t = false,
-            help = "remove the duplicated boilerplate names"
+            help = "Remove the duplicated boilerplate names"
         )]
         remove_duplication: bool,
+
+        #[clap(short, long = "in-place", help = "Update .gitignore files in-place")]
+        in_place: bool,
+
+        #[clap(short, long, help = "Show verbose output")]
+        verbose: bool,
 
         #[clap(help = "the boilerplate names to dump")]
         args: Vec<String>,
@@ -83,6 +92,8 @@ mod tests {
             GiboCommand::Dump {
                 keep_prologue: true,
                 remove_duplication: true,
+                in_place: false,
+                verbose: false,
                 args: vec!["+macos".to_string(), "linux".to_string()],
             }
         );
