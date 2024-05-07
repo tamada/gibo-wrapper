@@ -42,6 +42,6 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.repository_id }}:${{ steps.vars.outputs.tag }}
-            ghcr.io/${{ github.repository_owner }}/${{ github.repository_id }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ steps.vars.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
 
