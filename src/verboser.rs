@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub(crate) trait Verboser {
     fn print(&self, _message: String);
     fn eprint(&self, _message: String);

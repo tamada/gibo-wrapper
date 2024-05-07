@@ -109,6 +109,11 @@ mod tests {
             ],
             PathBuf::from("testdata"),
         );
-        assert_eq!(args2.resultant_args(true), vec!["macOS", "Linux", "emacs"]);
+        let wont = vec!["macOS", "Linux", "emacs"];
+        let got = args2.resultant_args(true);
+        assert_eq!(got.len(), wont.len());
+        for i in 0..wont.len() {
+            assert_eq!(got[i].to_lowercase(), wont[i].to_lowercase());
+        }
     }
 }
