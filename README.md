@@ -3,7 +3,7 @@
 [![build](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml/badge.svg)](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/tamada/gibo-wrapper/badge.svg?branch=main)](https://coveralls.io/github/tamada/gibo-wrapper?branch=main)
 
-[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.8.0-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.8.0)
+[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.8.1-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.8.1)
 [![Unlicense license](http://img.shields.io/badge/license-Unlicense-blue.svg?style=flat)](LICENSE)
 
 [`gibo`](https://github.com/simonwhitaker/gibo) is a great tool for creating `.gitignore` files.
