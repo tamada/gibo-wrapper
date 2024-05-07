@@ -11,13 +11,6 @@ However, `gibo` can improve some features in the aspect of managing `.gitignore`
 Then, I sent [a pull request](https://github.com/simonwhitaker/gibo/pull/61) to `gibo`. However, it was not accepted because it seemed to be different from the author's direction.
 Therefore, I created the wrapper of `gibo` to introduce the new features for managing `.gitignore`.
 
-## Usage
-
-1. install `gibo` command.
-2. define `alias` in your `.bashrc` or `.zshrc` file.
-  * `alias gibo='gibo-wrapper $@'`
-3. Use `gibo-wrapper` as `gibo`.
-
 ## Install
 
 ### :beer: Homebrew
@@ -35,13 +28,31 @@ cargo build --release
 # put the resultant executable 'gibo-wrapper' into the suitable location.
 ```
 
-## Additional Commands
+### Setup `gibo-wrapper`
 
-In the following example, `gibo` command is `gibo-wrapper`, it is aliased.
+1. install `gibo` command.
+2. define `alias` in your `.bashrc` or `.zshrc` file.
+  * `alias gibo='gibo-wrapper $@'`
+3. Use `gibo-wrapper` as `gibo`.
 
-### `current-list` command
+## :runner: Usage
 
-list boilerplates of `.gitignore` files in the current directory.
+`gibo-wrapper` introduces the new commands `current-list` and update `dump` command for applying some options.
+
+### `gibo-wrapper current-list`
+
+`current-list` sub-command for `gibo-wrapper` shows the list of boilerplates in the `.gitignore` file in the current directory.
+
+```sh
+List the current boilerplates in the .gitignore file
+
+Usage: gibo-wrapper current-list
+
+Options:
+  -h, --help  Print help
+```
+
+#### Example
 
 ```bash
 $ gibo current-list
@@ -49,7 +60,34 @@ macOS            Linux            Windows          Go
 VisualStudioCode JetBrains
 ```
 
-### Additional features for `dump` command
+### `gibo-wrapper dump`
+
+`dump` sub-command for `gibo-wrapper` adds four new options, `--keep-prologue`, `--remove-duplication`, `--in-place`, and `--verbose`.
+
+```sh
+Dump a boilerplate
+
+Usage: gibo-wrapper dump [OPTIONS] [ARGS]...
+
+Arguments:
+  [ARGS]...  the boilerplate names to dump
+
+Options:
+  -k, --keep-prologue       Keep the prologue of the .gitignore
+  -r, --remove-duplication  Remove the duplicated boilerplate names
+  -i, --in-place            Update .gitignore files in-place.
+  -v, --verbose             Show verbose output
+  -h, --help                Print help
+```
+
+In the following example, `gibo` is `gibo-wrapper`, it is aliased.
+
+#### `--in-place` option
+
+`--in-place` option is for updating the `.gitignore` file in the current directory.
+If you use redirect (`>`), such as `gibo dump +macos > .gitignore`, at first `.gitignore` file is truncated and then the `gibo` is executed.
+Therefore, append, and remove mode cannot be used with redirect.
+Hence, `gibo-wrapper` introduces `--in-place` option for updating `.gitignore`.
 
 #### append mode
 
@@ -61,7 +99,7 @@ Finally, `gibo` dumps boilerplates of the resultant name list.
 ```
 $ gibo current-list
 macOS            Linux            Go
-$ gibo dump +windows > .gitignore
+$ gibo dump --in-place +windows 
 $ gibo current-list
 macOS            Linux            Go               Windows
 ```
@@ -74,13 +112,13 @@ In the remove mode, `gibo` removes the given names from the boilerplates list.
 ```bash
 $ gibo current-list
 macOS            Linux            Go               Windows
-$ gibo dump _windows > .gitignore
+$ gibo dump --in-place _windows
 $ gibo current-list
 macOS            Linux            Go
 ```
 
 ```bash
-$ gibo dump macos linux windows _windows > .gitignore
+$ gibo dump --in-place macos linux windows _windows
 $ gibo current-list
 macOS            Linux            Go
 ```
