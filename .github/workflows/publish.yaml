@@ -53,6 +53,9 @@ jobs:
   publish:
     runs-on: ${{ matrix.os }}
     needs: setup
+    outputs:
+      appname: gibo-wrapper
+      tag: ${{ needs.setup.outputs.tag }}
     strategy:
       matrix:
         include:
