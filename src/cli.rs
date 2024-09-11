@@ -7,6 +7,7 @@ use std::fmt::{Display, Formatter, Result};
     author,
     about,
     arg_required_else_help = true,
+    disable_version_flag = true,
     long_about = "gibo-wrapper acts like gibo and improves gibo by adding the following features.
     1. current-list command for dumping the boilerplates while keeping the prologue of .gitignore file.
     2. dump command improvements
