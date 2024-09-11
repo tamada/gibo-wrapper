@@ -6,11 +6,10 @@ use std::path::PathBuf;
 /// and return them as a list (one line is one element).
 /// If the current directory does not have the .gitignore file, return an empty list.
 pub fn find_prologue(dir: &PathBuf) -> Vec<String> {
-    let ignore_file = dir.join(PathBuf::from(".gitignore"));
-    if !ignore_file.exists() {
-        return vec![];
-    }
-    let file = File::open(ignore_file).unwrap();
+    let file = match open_ignore_file(dir) {
+        None => return vec![],
+        Some(file) => file,
+    };
     let reader = BufReader::new(file);
     let mut items = vec![];
     for line in reader.lines() {
@@ -41,15 +40,25 @@ fn find_boilerplate_name(line: String) -> Option<String> {
     }
 }
 
+fn open_ignore_file(dir: &PathBuf) -> Option<File> {
+    let ignore_file = dir.join(PathBuf::from(".gitignore"));
+    if !ignore_file.exists() {
+        return None;
+    }
+    match File::open(ignore_file) {
+        Err(_) => None,
+        Ok(file) => Some(file),
+    }
+}
+
 /// Extract the boilerplates in the .gitignore file on the current directory
 /// and return them as a list.
 /// If the current directory does not have the .gitignore file, return an empty list.
 pub fn current_list(dir: &PathBuf) -> Vec<String> {
-    let ignore_file = dir.join(PathBuf::from(".gitignore"));
-    if !ignore_file.exists() {
-        return vec![];
-    }
-    let file = File::open(ignore_file).unwrap();
+    let file = match open_ignore_file(dir) {
+        None => return vec![],
+        Some(file) => file,
+    };
     let reader = BufReader::new(file);
     let mut items = vec![];
     for line in reader.lines() {

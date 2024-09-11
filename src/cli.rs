@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::fmt::{Display, Formatter, Result};
 
 #[derive(Parser, Debug, PartialEq)]
-#[clap(
+#[command(
     version,
     author,
     about,
