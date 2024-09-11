@@ -3,7 +3,7 @@
 [![build](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml/badge.svg)](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/tamada/gibo-wrapper/badge.svg?branch=main)](https://coveralls.io/github/tamada/gibo-wrapper?branch=main)
 
-[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.8.1-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.8.1)
+[![gibo-wrapper](https://img.shields.io/badge/gibo--wrapper-v0.9.0-blue)](https://github.com/tamada/gibo-wrapper/releases/tag/v0.9.0)
 [![Unlicense license](http://img.shields.io/badge/license-Unlicense-blue.svg?style=flat)](LICENSE)
 
 [`gibo`](https://github.com/simonwhitaker/gibo) is a great tool for creating `.gitignore` files.
@@ -36,6 +36,42 @@ cargo build --release
 3. Use `gibo-wrapper` as `gibo`.
 
 ## :runner: Usage
+
+
+```sh
+gibo-wrapper acts like gibo and improves gibo by adding the following features.
+    1. introduce current-list subcommand for dumping the boilerplates 
+       while keeping the prologue of .gitignore file.
+    2. improves dump subcommand
+       * append mode: appending the boilerplates into the .gitignore file.
+       * remove mode: removing the boilerplates from the .gitignore file.
+       * remove-duplication option removes the duplicated boilerplates names by 
+         dumping (-r option).
+       * keep-prologue option keeps the prologue in the .gitignore (-k option).
+    3. introduce the option for root subcommand
+       * --open option of root subcommand opens the folder in the GUI file manager.
+
+Usage: gibo-wrapper [OPTIONS] <COMMAND>
+
+Commands:
+  dump          Dump a boilerplate
+  list          List available boilerplates
+  current-list  List the current boilerplates in the .gitignore file
+  root          Show the directory where gibo stores its boilerplates
+  search        Search for boilerplates
+  update        Update the gitignore boilerplate repository
+  version       Show the current version number of gibo
+  help          Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose
+          Show verbose output
+
+  -h, --help
+          Print help (see a summary with '-h')
+```
+
+### Improvements
 
 `gibo-wrapper` introduces the new commands `current-list` and update `dump` command for applying some options.
 
