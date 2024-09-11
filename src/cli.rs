@@ -9,12 +9,14 @@ use std::fmt::{Display, Formatter, Result};
     arg_required_else_help = true,
     disable_version_flag = true,
     long_about = "gibo-wrapper acts like gibo and improves gibo by adding the following features.
-    1. current-list command for dumping the boilerplates while keeping the prologue of .gitignore file.
-    2. dump command improvements
+    1. introduce current-list subcommand for dumping the boilerplates while keeping the prologue of .gitignore file.
+    2. improve dump subcommand
        * append mode: appending the boilerplates into the .gitignore file.
        * remove mode: removing the boilerplates from the .gitignore file.
        * remove-duplication option removes the duplicated boilerplates names by dumping (-r option).
-       * keep-prologue option keeps the prologue in the .gitignore (-k option)."
+       * keep-prologue option keeps the prologue in the .gitignore (-k option).
+    3. introduce the option for root subcommand
+       * --open option of root subcommand opens the folder in the GUI file manager."
 )]
 pub struct CliOpts {
     #[clap(subcommand)]
@@ -60,7 +62,10 @@ Remove boilerplates from the current .gitignore file if the name starts with `_`
     #[command(about = "List the current boilerplates in the .gitignore file")]
     CurrentList,
     #[command(about = "Show the directory where gibo stores its boilerplates")]
-    Root,
+    Root {
+        #[clap(short = 'o', long = "open", help = "Open the folder in the GUI file manager")]
+        open: bool,
+    },
     #[command(about = "Search for boilerplates")]
     Search,
     #[command(about = "Update the gitignore boilerplate repository")]
@@ -75,7 +80,7 @@ impl Display for GiboCommand {
             GiboCommand::Dump { .. } => write!(f, "dump"),
             GiboCommand::List => write!(f, "list"),
             GiboCommand::CurrentList => write!(f, "current-list"),
-            GiboCommand::Root => write!(f, "root"),
+            GiboCommand::Root { .. } => write!(f, "root"),
             GiboCommand::Search => write!(f, "search"),
             GiboCommand::Update => write!(f, "update"),
             GiboCommand::Version => write!(f, "version"),

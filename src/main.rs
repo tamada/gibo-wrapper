@@ -62,6 +62,23 @@ fn wrapped_version(_app: cli::CliOpts, v: &Box<dyn verboser::Verboser>) -> Resul
     call_gibo_command("version".into(), vec![], v)
 }
 
+fn open_impl(open_flag: bool, v: &Box<dyn verboser::Verboser>) -> Result<(), io::Error> {
+    let o = call_gibo_command("root".into(), vec![], v);
+    if open_flag {
+        let output = o.unwrap();
+        let path = String::from_utf8(output.stdout).unwrap();
+        match opener::open(path.trim()) {
+            Ok(_) => Ok(()),
+            Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
+        }
+    } else {
+        match o {
+            Ok(output) => write_to_stdout(output),
+            Err(e) => Err(e),
+        }
+    }
+}
+
 fn main() {
     let app = cli::CliOpts::parse();
     let dir = PathBuf::from(".");
@@ -82,7 +99,8 @@ fn main() {
             Ok(output) => write_to_stdout(output),
             Err(e) => Err(e),
         },
-        List | Root | Search | Update => {
+        Root{ open } => open_impl(open, &verboser),
+        List | Search | Update => {
             match call_gibo_command(format!("{}", app.command), vec![], &verboser) {
                 Ok(output) => write_to_stdout(output),
                 Err(e) => Err(e),
