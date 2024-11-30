@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use clap::Parser;
+use clap::{Parser, CommandFactory};
 use cli::GiboCommand::{CurrentList, Dump, List, Root, Search, Update, Version};
 
 mod cli;
@@ -18,9 +18,13 @@ fn call_gibo_command(command: String, args: Vec<String>, v: &Box<dyn verboser::V
         .output()
 }
 
-fn write_to_stdout(output: Output) -> Result<(), std::io::Error> {
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
+fn write_to_stdout(output: Output, _v: &Box<dyn verboser::Verboser>) -> Result<(), std::io::Error> {
+    if let Err(e) = io::stdout().write_all(&output.stdout) {
+        return Err(e);
+    }
+    if let Err(e) = io::stderr().write_all(&output.stderr) {
+        return Err(e);
+    }
     Ok(())
 }
 
@@ -30,11 +34,14 @@ fn print_prologue(dest: &mut Box<dyn Write>, prologue: Vec<String>) {
     }
 }
 
-fn write_output(dest: &mut Box<dyn Write>, output: Output) -> Result<(), io::Error>{
+fn write_output(dest: &mut Box<dyn Write>, output: Output, _v: &Box<dyn verboser::Verboser>) -> Result<(), io::Error>{
+    if let Err(e) = io::stderr().write_all(&output.stderr) {
+        return Err(e);
+    }
     dest.write_all(&output.stdout)
 }
 
-fn perform_dump(keep_prologue: bool, remove_duplication: bool, in_place: bool, verbose: bool, args: Vec<String>) -> Result<(), std::io::Error> {
+fn perform_dump(keep_prologue: bool, remove_duplication: bool, in_place: bool, verbose: bool, args: Vec<String>) -> Result<(), io::Error> {
     let verboser = verboser::create(verbose);
     let dump_args = dump::DumpArgs::new_with_cwd(args);
     let new_args = dump_args.resultant_args(remove_duplication);
@@ -51,7 +58,32 @@ fn perform_dump(keep_prologue: bool, remove_duplication: bool, in_place: bool, v
     if keep_prologue {
         print_prologue(&mut dest, dump_args.prologue());
     }
-    write_output(&mut dest, o)
+    write_output(&mut dest, o, &verboser)
+}
+
+fn wrapped_version(_app: cli::CliOpts, v: &Box<dyn verboser::Verboser>) -> Result<Output, io::Error> {
+    let binding = cli::CliOpts::command();
+    let version = binding.get_version();
+    println!("gibo-wrapper version {}", version.unwrap());
+    print!("gibo         version ");
+    call_gibo_command("version".into(), vec![], v)
+}
+
+fn open_impl(open_flag: bool, v: &Box<dyn verboser::Verboser>) -> Result<(), io::Error> {
+    let o = call_gibo_command("root".into(), vec![], v);
+    if open_flag {
+        let output = o.unwrap();
+        let path = String::from_utf8(output.stdout).unwrap();
+        match opener::open(path.trim()) {
+            Ok(_) => Ok(()),
+            Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
+        }
+    } else {
+        match o {
+            Ok(output) => write_to_stdout(output, v),
+            Err(e) => Err(e),
+        }
+    }
 }
 
 fn main() {
@@ -70,14 +102,15 @@ fn main() {
             terminal::print_in_column(list::current_list(&dir));
             Ok(())
         },
-        List | Root | Search | Update | Version => {
+        Version => match wrapped_version(app, &verboser) {
+            Ok(output) => write_to_stdout(output, &verboser),
+            Err(e) => Err(e),
+        },
+        Root{ open } => open_impl(open, &verboser),
+        List | Search | Update => {
             match call_gibo_command(format!("{}", app.command), vec![], &verboser) {
-                Ok(output) => {
-                    write_to_stdout(output)
-                },
-                Err(e) => {
-                    Err(e)
-                },
+                Ok(output) => write_to_stdout(output, &verboser),
+                Err(e) => Err(e),
             }
         }
     };
