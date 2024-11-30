@@ -49,7 +49,7 @@ pub(crate) enum GiboCommand {
         #[clap(short, long = "in-place", help = "Update .gitignore files in-place")]
         in_place: bool,
 
-        #[clap(short, long, help = "Show verbose output")]
+        #[clap(short, long, help = "Set to verbose output")]
         verbose: bool,
 
         #[clap(help = "the boilerplate names to dump.
