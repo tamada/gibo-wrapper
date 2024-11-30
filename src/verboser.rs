@@ -54,13 +54,9 @@ mod tests {
     #[test]
     fn test_create() {
         let v1 = create(true);
-        if v1.name() != "DefaultVerboser" {
-            assert!(false, "v1 is not DefaultVerboser");
-        }
+        assert_eq!(v1.name(), "DefaultVerboser");
 
         let v2 = create(false);
-        if v2.name() != "NullVerboser" {
-            assert!(false, "v2 is not NullVerboser");
-        }
+        assert_eq!(v2.name(), "NullVerboser");
     }
 }
