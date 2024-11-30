@@ -93,4 +93,12 @@ mod tests {
             Some("Linux".to_string())
         );
     }
+
+    #[test]
+    fn test_find_prologue() {
+        let result = find_prologue(&PathBuf::from("testdata"));
+        assert_eq!(result.len(), 2, "result should be 2");
+        assert_eq!(result[0], "mise.toml", "result[0] should be mise.toml");
+        assert_eq!(result[1], "");
+    }
 }
