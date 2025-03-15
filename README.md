@@ -1,5 +1,8 @@
 # gibo-wrapper
 
+> [!WARNING]
+> This project is now archived because I created the successor project [`gixor`](https://github.com/tamada/gixor).
+
 [![build](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml/badge.svg)](https://github.com/tamada/gibo-wrapper/actions/workflows/build.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/tamada/gibo-wrapper/badge.svg?branch=main)](https://coveralls.io/github/tamada/gibo-wrapper?branch=main)
 
